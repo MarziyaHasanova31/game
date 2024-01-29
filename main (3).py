@@ -2,15 +2,33 @@ import random
 import unittest
 
 class Ship:
-    def __init__(self, x, y, length, direction):  # инициализатор
+    """Класс, представляющий корабль.
+
+     Args:
+         x (int): Координата X корабля на игровой доске.
+         y (int): Координата Y корабля на игровой доске.
+         length (int): Длина корабля.
+         direction (str): Направление корабля ('h' - горизонтально, 'v' - вертикально).
+
+     Attributes:
+         x (int): Координата X корабля на игровой доске.
+         y (int): Координата Y корабля на игровой доске.
+         length (int): Длина корабля.
+         direction (str): Направление корабля ('h' - горизонтально, 'v' - вертикально).
+         hits (int): Количество попаданий по кораблю.
+
+     Methods:
+         hit(): Обрабатывает попадание по кораблю и возвращает статус поражения или ранения.
+     """
+    def __init__(self, x, y, length, direction):
         self.x = x
         self.y = y
         self.length = length
         self.direction = direction
         self.hits = 0
 
-    def hit(self):  # self - ссылка на экземпляр класса
-        self.hits += 1  # счетчик количество попаданий
+    def hit(self):
+        self.hits += 1
         if self.hits == self.length:
             return "Уничтожен"
         else:
@@ -18,22 +36,37 @@ class Ship:
 
 
 class GameBoard:
+    """Класс, представляющий игровую доску.
+
+      Args:
+          size (int): Размер игровой доски (например, 10 для доски 10x10 клеток).
+
+      Attributes:
+          size (int): Размер игровой доски.
+          board (list): Двумерный список, представляющий игровую доску.
+
+      Methods:
+          place_ship(ship): Размещает корабль на игровой доске.
+          is_valid_move(x, y): Проверяет, является ли данное перемещение допустимым.
+          is_hit(x, y): Проверяет, было ли попадание по указанным координатам.
+          attack(x, y): Обрабатывает атаку игрока и возвращает результат (попадание или промах).
+      """
     def __init__(self, size):
         self.size = size
-        self.board = [[0] * size for _ in range(size)]  # list comprehension/ создают карту
-        # 0 - пустая клетка, 1 - корабль, 2 - попадание, 3 - промах
+        self.board = [[0] * size for _ in range(size)]
+
 
     def place_ship(self, ship):
 
-        if ship.direction == "h":  # h - horizontally - горизонтально
+        if ship.direction == "h":
             for i in range(ship.length):
-                self.board[ship.y][ship.x + i] = 1  # определение где стоит корабль
+                self.board[ship.y][ship.x + i] = 1
         else:
             for i in range(ship.length):
                 self.board[ship.y + i][ship.x] = 1
 
     def is_valid_move(self, x, y):
-        return 0 <= x < self.size and 0 <= y < self.size  # либо True либо False
+        return 0 <= x < self.size and 0 <= y < self.size
 
     def is_hit(self, x, y):
         return self.board[y][x] == 1
@@ -41,13 +74,25 @@ class GameBoard:
     def attack(self, x, y):
         if self.is_valid_move(x, y):
             if self.board[y][x] == 1:
-                self.board[y][x] = 2  # попадание
+                self.board[y][x] = 2
                 return "Hit"
             else:
-                self.board[y][x] = 3  # промах
+                self.board[y][x] = 3
                 return "Miss"
 
+"""Класс, представляющий игрока.
 
+Args:
+    name (str): Имя игрока.
+    board (GameBoard): Игровая доска, на которой размещаются корабли.
+
+Attributes:
+    name (str): Имя игрока.
+    board (GameBoard): Игровая доска игрока.
+
+Methods:
+    place_ships(ship_list): Размещает корабли из списка на игровой доске игрока.
+"""
 class Player:
     def __init__(self, name, board):
         self.name = name
@@ -59,7 +104,7 @@ class Player:
             while not valid_placement:
                 x = random.randint(0, self.board.size - 1)
                 y = random.randint(0, self.board.size - 1)
-                direction = random.choice(["h", "v"])  # h - horizontally, v - vertically
+                direction = random.choice(["h", "v"])
                 ship.x, ship.y, ship.direction = x, y, direction
                 if self.board.is_valid_move(x, y):
                     if direction == "h" and x + ship.length <= self.board.size and all(
@@ -72,6 +117,7 @@ class Player:
                         for i in range(ship.length):
                             self.board.board[y + i][x] = 1
                         valid_placement = True
+
 
 class Game:
     def __init__(self, player1, player2):
